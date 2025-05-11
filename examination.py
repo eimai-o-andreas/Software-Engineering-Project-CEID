@@ -6,6 +6,7 @@ class ExaminationSystem:
         self.root = root
         self.root.title("Ανάθεση Ιατρικών Εξετάσεων")
 
+
         self.all_exams = {
             "Αιματολογική": 25,
             "Ακτινογραφία": 50,
