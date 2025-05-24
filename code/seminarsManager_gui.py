@@ -115,3 +115,71 @@ class ViewSeminarRoomScreen:
         controller.clearScreen()
         ViewSeminarRoomScreen(master, controller, seminar, rooms, edit_mode=True)
     
+
+class ViewSeminarCalendarScreen:
+    def __init__(self, master, controller, seminar, available_dates, edit_mode=False):
+        self.master = master
+        self.controller = controller
+        self.seminar = seminar
+        self.dates = available_dates
+        self.edit_mode = edit_mode
+    
+        self.dates = self.displayDates()
+        
+    def displayDates(self):
+         self.frame = tk.Frame(self.master)
+         self.frame.pack()
+
+         tk.Label(self.frame, text="Επιλογή Ημερομηνίας και Ώρας").pack(pady=10)
+         self.selected_dt = tk.StringVar(value=self.seminar.datetime or (self.dates[0] if self.dates else ""))
+         tk.OptionMenu(self.frame, self.selected_dt, *self.dates).pack()
+         tk.Button(self.frame, text="Καταχώριση", command=self.selectDateTime).pack(pady=10)
+  
+    def selectDateTime(self):
+        self.seminar.datetime = self.selected_dt.get()
+        if self.edit_mode:
+            self.controller.clearScreen()
+            ViewSeminarScreen(self.master, self.controller)
+        else:
+            self.controller.saveSeminar()
+
+    def redirectToSeminarCalendarScreen(master, controller, seminar, edit_mode):
+        controller.clearScreen()
+        ViewSeminarCalendarScreen(master, controller, seminar, edit_mode)
+    
+    
+class SeminarDetailsScreen:
+    def __init__(self, master, controller, seminar):
+        self.master = master
+        self.controller = controller
+        self.seminar = seminar
+        self.frame = tk.Frame(master)
+        self.frame.pack()
+
+        tk.Label(self.frame, text=str(seminar)).pack(pady=10)
+        tk.Button(self.frame, text="Αλλαγή Αίθουσας", command=lambda: ViewSeminarRoomScreen.redirectToSeminarRoomScreen(controller, master, seminar, controller.fetchRooms() )).pack()
+        tk.Button(self.frame, text="Αλλαγή Ημερομηνίας/Ώρας",
+            command=lambda: ViewSeminarCalendarScreen(master, controller, seminar, controller.fetchAvailableDates(seminar), True)).pack()
+        tk.Button(self.frame, text="Διαγραφή Σεμιναρίου", command=controller.callControllerForDelete).pack()
+    
+
+class Message5Screen:
+    def __init__(self, master, controller, seminar):
+        self.master = master
+        self.controller = controller
+        self.seminar = seminar
+        self.frame = tk.Frame(master)
+        self.frame.pack()
+
+        tk.Label(self.frame, text="Δεν υπάρχει διαθέσιμη αίθουσα.").pack(pady=10)
+        tk.Button(self.frame, text="Προσθήκη στη λίστα αναμονής", command=self.addToWaitList).pack()
+
+    def addToWaitList(self):       
+        self.controller.callControllerForWaitList()
+    
+if __name__ == "__main__":
+    import tkinter as tk
+    root = tk.Tk()
+    root.title("Διαχείριση Σεμιναρίων")
+    app = ManagerSeminarController(root)
+    root.mainloop()
