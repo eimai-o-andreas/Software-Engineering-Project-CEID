@@ -1,6 +1,8 @@
 import tkinter as tk
 from parent import Parent
 from doctor import Doctor
+from medicalRecord import MedicalRecord 
+from notificationService import NotificationService
 
 class Medicine:
     available_medicines = [
@@ -13,6 +15,26 @@ class Medicine:
     @staticmethod
     def getMedicine():
         return Medicine.available_medicines
+    
+class Prescription:
+    _next_id = 1
+    prescriptions = []
+
+    def __init__(self, medicine, dosage, parent: Parent, doctor: Doctor, medical_record: MedicalRecord):
+        self.id = Prescription._next_id
+        Prescription._next_id += 1
+
+        self.medicine = medicine
+        self.dosage = dosage
+        self.parent = parent
+        self.doctor = doctor
+        self.medical_record = medical_record
+
+        Prescription.prescriptions.append(self)
+
+    @staticmethod
+    def addNewPrescription(medicine, dosage, parent: Parent, doctor: Doctor, medical_record: MedicalRecord):
+        return Prescription(medicine, dosage, parent, doctor, medical_record)
 
 class PrescriptionController:
     def __init__(self, gui=None, doctor=None, parent=None, medical_record=None):
@@ -38,3 +60,20 @@ class PrescriptionController:
             win = tk.Toplevel(self.gui.root)
             from prescrMed_gui import Message11Screen
             Message11Screen(win)
+
+    def acceptOrRejectPrescription(self, medicine_name, dosage, save):
+        if save:
+            Prescription.addNewPrescription(
+                medicine_name,
+                dosage,
+                self.parent,
+                self.doctor,
+                self.medical_record
+            )
+            self.medical_record.updateMedicalRecordM(medicine_name, dosage)
+            NotificationService.sendMedicationMessageToParent(self.parent, medicine_name, dosage)
+            print(f"Η συνταγή για {medicine_name} με δοσολογία {dosage} αποθηκεύτηκε.")
+        else:
+            win = tk.Toplevel(self.gui.root)
+            from prescrMed_gui import RejectPrescriptionScreen
+            RejectPrescriptionScreen(win)
