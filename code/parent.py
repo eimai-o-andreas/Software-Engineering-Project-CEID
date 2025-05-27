@@ -1,4 +1,4 @@
-
+from user import User
 
 class Parent(User):
     all_parents = {}
