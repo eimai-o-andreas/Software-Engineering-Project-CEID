@@ -155,14 +155,15 @@ class SeminarDetailsScreen:
         self.seminar = seminar
         self.frame = tk.Frame(master)
         self.frame.pack()
-
-        tk.Label(self.frame, text=str(seminar)).pack(pady=10)
-        tk.Button(self.frame, text="Αλλαγή Αίθουσας", command=lambda: ViewSeminarRoomScreen.redirectToSeminarRoomScreen(controller, master, seminar, controller.fetchRooms() )).pack()
-        tk.Button(self.frame, text="Αλλαγή Ημερομηνίας/Ώρας",
-            command=lambda: ViewSeminarCalendarScreen(master, controller, seminar, controller.fetchAvailableDates(seminar), True)).pack()
-        tk.Button(self.frame, text="Διαγραφή Σεμιναρίου", command=controller.callControllerForDelete).pack()
+        self.displaySeminarInformation()
     
-
+    def displaySeminarInformation(self):
+        tk.Label(self.frame, text=str(self.seminar)).pack(pady=10)
+        tk.Button(self.frame, text="Αλλαγή Αίθουσας", command=lambda: ViewSeminarRoomScreen.redirectToSeminarRoomScreen(self.controller, self.master, self.seminar, self.controller.fetchRooms() )).pack()
+        tk.Button(self.frame, text="Αλλαγή Ημερομηνίας/Ώρας",
+            command=lambda: ViewSeminarCalendarScreen(self.master, self.controller, self.seminar, self.controller.fetchAvailableDates(self.seminar), True)).pack()
+        tk.Button(self.frame, text="Διαγραφή Σεμιναρίου", command=self.controller.callControllerForDelete).pack()
+    
 class Message5Screen:
     def __init__(self, master, controller, seminar):
         self.master = master
