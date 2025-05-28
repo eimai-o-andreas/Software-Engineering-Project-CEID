@@ -143,3 +143,4 @@ class ManagerSeminarController:
         messagebox.showinfo("Λίστα Αναμονής", "Το σεμινάριο προστέθηκε στη λίστα αναμονής.")
         self.startUI()
         return "OK"
+

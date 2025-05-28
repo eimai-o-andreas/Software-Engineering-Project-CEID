@@ -164,6 +164,7 @@ class SeminarDetailsScreen:
             command=lambda: ViewSeminarCalendarScreen(self.master, self.controller, self.seminar, self.controller.fetchAvailableDates(self.seminar), True)).pack()
         tk.Button(self.frame, text="Διαγραφή Σεμιναρίου", command=self.controller.callControllerForDelete).pack()
     
+
 class Message5Screen:
     def __init__(self, master, controller, seminar):
         self.master = master
