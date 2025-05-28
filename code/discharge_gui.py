@@ -1,50 +1,62 @@
-
-
 import tkinter as tk
 from tkinter import messagebox
 
-class DischargeSystem:
-    def init(self, root):
-        self.root = root
-        self.root.title("Σύστημα Έκδοσης Εξιτηρίου")
+class ViewParentScreen(tk.Frame):
+    def __init__(self, master, controller):
+        super().__init__(master)
+        self.controller = controller
+                                   
+        self.parent_var = tk.StringVar()
+        self.parents = self.controller.fetchParents()
+        self.displayParents()
+    
+    def displayParents(self):
+        tk.Label(self, text="Επιλογή Γονέα:").pack(pady=10)
+        self.parent_var.set(self.parents[0])
+        tk.OptionMenu(self, self.parent_var, *self.parents).pack()  
 
-        self.parents = ["Γονέας 1", "Γονέας 2", "Γονέας 3"]
-        self.accounts = {"Γονέας 1": 0, "Γονέας 2": 1, "Γονέας 3": 0}  # 0=no pending, 1=pending
+        tk.Button(self, text="Συνέχεια", command=self.chooseParent).pack(pady=20)
 
-        self.create_widgets()
+    def chooseParent(self):
+        selected_parent = self.parent_var.get()
+        pending = self.controller.checkForPendingPayments(selected_parent)
 
-    def create_widgets(self):
-        # Επιλογή γονέα
-        tk.Label(self.root, text="Επιλογή Γονέα:").pack()
-        self.selected_parent = tk.StringVar(self.root)
-        self.selected_parent.set(self.parents[0])
-        tk.OptionMenu(self.root, self.selected_parent, *self.parents).pack()
-
-        # Κουμπί έκδοσης εξιτηρίου
-        tk.Button(self.root, text="Έκδοση Εξιτηρίου", command=self.issue_discharge).pack(pady=10)
-
-    def issue_discharge(self):
-        parent = self.selected_parent.get()
-        has_pending = self.accounts[parent]
-
-        if has_pending:
-            self.show_pending_accounts()
+        if pending:
+            self.controller.foundPending(selected_parent, pending)
         else:
-            self.send_message_and_update()
-            messagebox.showinfo("Επιτυχία", f"Ο γονέας '{parent}' έλαβε το εξιτήριο.\nΤο δωμάτιο ενημερώθηκε ως ελεύθερο.")
+            self.controller.noPending(selected_parent, None)
 
-    def show_pending_accounts(self):
-        messagebox.showwarning("Εκκρεμείς Λογαριασμοί", "Ο γονέας έχει εκκρεμείς λογαριασμούς.\nΔεν είναι δυνατή η έκδοση εξιτηρίου.")
 
-    def send_message_and_update(self):
-        # Θα προσθέταμε εδώ σύνδεση με backend ή αποστολή email
-        print("Αποστολή μηνύματος σε γονέα, θεράποντα, νοσηλευτές...")
-        print("Ενημέρωση δωματίου ως ελεύθερο...")
+class ViewPaymentsScreen(tk.Frame):
+    def __init__(self, master, parent_name, pending_payments, on_back):
+        super().__init__(master)
+        self.parent_name = parent_name
+        self.pending = pending_payments
+        self.on_back = on_back
+        self.displayPendingPayments(parent_name)
 
-if name == "main":
-    root = tk.Tk()
-    app = DischargeSystem(root)
-    root.mainloop()
+    def displayPendingPayments(self,parent_name):
+        tk.Label(self, text=f"Εκκρεμείς Πληρωμές για {parent_name}", fg="red").pack(pady=10)
+        for p in self.pending:
+            tk.Label(self, text=f"Πληρωμή ID: {p.id} - Ποσό: {p.cost}€").pack()
 
+        tk.Button(self, text="Πίσω", command=self.on_back).pack(pady=20)
+
+class DischargeScreen(tk.Frame):
+    def __init__(self, master, controller, parent_name, on_done):
+        super().__init__(master)
+        self.controller = controller
+        self.parent_name = parent_name
+        self.on_done = on_done
+        self.displayDischargeScreen(parent_name)
+
+    def displayDischargeScreen(self,parent_name):
+        tk.Label(self, text=f"Έκδοση εξιτηρίου για {parent_name}").pack(pady=10)
+        tk.Button(self, text="Έκδοση", command=self.issueDischarge).pack(pady=20)
+
+    def issueDischarge(self):
+        self.controller.callControllerForDischarge(self.parent_name)
+        messagebox.showinfo("Επιτυχία", f"Εκδόθηκε εξιτήριο για τον {self.parent_name}")
+        self.on_done()
 
 
