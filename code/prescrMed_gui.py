@@ -88,14 +88,14 @@ class RejectPrescriptionScreen:
 
 
 
-if __name__ == "__main__":
-    import presMed 
-    root = tk.Tk()
-    controller = presMed.PrescriptionController()
-    import parent
-    parent_dict = {
-        "Μαρία Παπαδοπούλου": parent.Parent(1, "Μαρία", "Παπαδοπούλου")
-    }
+# if __name__ == "__main__":
+#     import presMed 
+#     root = tk.Tk()
+#     controller = presMed.PrescriptionController()
+#     import parent
+#     parent_dict = {
+#         "Μαρία Παπαδοπούλου": parent.Parent(1, "Μαρία", "Παπαδοπούλου")
+#     }
 
-    controller.showMedicineScreen(root, parent_dict)
-    root.mainloop()
+#     controller.showMedicineScreen(root, parent_dict)
+#     root.mainloop()
